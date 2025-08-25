@@ -22,16 +22,65 @@
 #
 
 import streamlit as st
-from config.config import my_config, save_config, languages, test_config, local_audio_tts_providers, \
-    local_audio_recognition_providers, local_audio_recognition_fasterwhisper_module_names, \
-    local_audio_recognition_fasterwhisper_device_types, local_audio_recognition_fasterwhisper_compute_types, \
-    delete_first_visit_session_state, app_title
-from pages.common import common_ui
-from tools.tr_utils import tr
+
+# Error handling for missing dependencies in minimal deployment
+try:
+    from config.config import my_config, save_config, languages, test_config, local_audio_tts_providers, \
+        local_audio_recognition_providers, local_audio_recognition_fasterwhisper_module_names, \
+        local_audio_recognition_fasterwhisper_device_types, local_audio_recognition_fasterwhisper_compute_types, \
+        delete_first_visit_session_state, app_title
+    from pages.common import common_ui
+    from tools.tr_utils import tr
+    CONFIG_AVAILABLE = True
+except ImportError as e:
+    CONFIG_AVAILABLE = False
+    st.error(f"⚠️ 配置模块加载失败: {str(e)}")
+    st.info("🔧 当前为最小化部署模式，某些功能可能不可用")
+    app_title = "MoneyPrinterPlus (最小化模式)"
+    
+    # Fallback functions
+    def tr(text):
+        return text
+    
+    def common_ui():
+        pass
+    
+    def delete_first_visit_session_state(key):
+        pass
 
 delete_first_visit_session_state("all_first_visit")
 
 common_ui()
+
+# Display minimal interface if configuration is not available
+if not CONFIG_AVAILABLE:
+    st.markdown("""<div class="main-title">MoneyPrinterPlus (最小化模式)</div>""", unsafe_allow_html=True)
+    st.markdown('<div class="sub-title">🔧 当前运行在最小化部署模式</div>', unsafe_allow_html=True)
+    
+    st.warning("""⚠️ **当前为最小化部署模式**
+    
+    由于依赖包限制，某些功能暂时不可用：
+    - LLM内容生成功能
+    - 音频处理功能
+    - 视频编辑功能
+    - 第三方API集成
+    
+    如需完整功能，请在本地环境中运行应用。""")
+    
+    st.info("""💡 **可用功能**：
+    - 基础界面展示
+    - 配置文件查看
+    - 帮助文档""")
+    
+    st.markdown("---")
+    st.markdown("### 📖 使用说明")
+    st.markdown("""
+    1. **本地部署**：克隆项目到本地环境，安装完整依赖后运行
+    2. **功能体验**：当前版本仅供界面预览和基础功能演示
+    3. **技术支持**：访问 [GitHub仓库](https://github.com/ddean2009/MoneyPrinterPlus) 获取完整版本
+    """)
+    
+    st.stop()  # Stop execution here for minimal mode
 
 # 添加自定义CSS样式
 st.markdown("""

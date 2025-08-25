@@ -1,22 +1,7 @@
-# Minimal requirements for Streamlit Cloud deployment
-# Only essential packages to avoid PyAV and other build dependencies
-
-# Core Streamlit
+# Ultra-minimal requirements for Streamlit Cloud deployment
+# Only the most basic packages that are guaranteed to work
 streamlit==1.34.0
-
-# Essential utilities
 requests
-pillow
-numpy==1.26.4
 
-# Basic LLM support (minimal)
-openai==1.16.2
-tenacity==8.3.0
-
-# Removed all packages that might have indirect dependencies on PyAV or require build tools:
-# langchain packages - may have complex dependencies
-# langchain_openai, langchain, langchain-community - potential PyAV dependencies
-# aiohttp - may have build dependencies
-# qianfan, dashscope - Chinese services with potential dependencies
-# aliyun-python-sdk-core, tencentcloud-sdk-python-tts - cloud services with dependencies
-# psutil, pyperclip - system utilities that might need build tools
+# All other packages removed to resolve dependency installation errors
+# Features requiring additional packages will show appropriate error messages

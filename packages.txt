@@ -1,24 +1,2 @@
-# Build tools and dependencies
-pkg-config
-build-essential
-
-# Media and system libraries
-ffmpeg
-libsndfile1
-libgl1-mesa-glx
-libglib2.0-0
-libsm6
-libxext6
-libxrender-dev
-libgomp1
-libfontconfig1
-libxss1
-
-# Additional build dependencies for PyAV and other packages
-libavformat-dev
-libavcodec-dev
-libavdevice-dev
-libavutil-dev
-libswscale-dev
-libswresample-dev
-libavfilter-dev
+# Ultra-minimal system packages
+# Only the most basic packages needed for Streamlit
