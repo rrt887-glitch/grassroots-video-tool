@@ -29,7 +29,6 @@ from io import BytesIO
 
 import numpy as np
 import requests
-import torch
 from pydub import AudioSegment
 from pydub.playback import play
 
@@ -37,7 +36,21 @@ from config.config import my_config
 from tools.file_utils import read_file, convert_mp3_to_wav
 from tools.utils import must_have_value, random_with_system_time
 import streamlit as st
-import pybase16384 as b14
+
+# 条件导入torch和pybase16384
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    torch = None
+
+try:
+    import pybase16384 as b14
+    PYBASE16384_AVAILABLE = True
+except ImportError:
+    PYBASE16384_AVAILABLE = False
+    b14 = None
 
 # 获取当前脚本的绝对路径
 script_path = os.path.abspath(__file__)
@@ -52,7 +65,10 @@ audio_output_dir = os.path.join(script_dir, "../../work")
 audio_output_dir = os.path.abspath(audio_output_dir)
 
 
-def encode_spk_emb(spk_emb: torch.Tensor) -> str:
+def encode_spk_emb(spk_emb) -> str:
+    if not TORCH_AVAILABLE or not PYBASE16384_AVAILABLE:
+        raise ImportError("torch和pybase16384依赖不可用，无法处理语音嵌入")
+    
     arr: np.ndarray = spk_emb.to(dtype=torch.float16, device="cpu").detach().numpy()
     s = b14.encode_to_string(
         lzma.compress(
@@ -91,9 +107,19 @@ class ChatTTSAudioService:
             self.audio_seed = None
             if os.path.exists(st.session_state.get('audio_voice')):
                 if st.session_state.get('audio_voice').endswith('.pt'):
-                    self.audio_content = encode_spk_emb(torch.load(st.session_state.get('audio_voice'), map_location=torch.device('cpu')))
-                if st.session_state.get('audio_voice').endswith('.txt'):
+                    if not TORCH_AVAILABLE:
+                        st.error("PyTorch未安装，无法加载.pt语音文件。请使用.txt格式的语音文件或在本地环境中运行。")
+                        self.audio_content = None
+                    else:
+                        try:
+                            self.audio_content = encode_spk_emb(torch.load(st.session_state.get('audio_voice'), map_location=torch.device('cpu')))
+                        except ImportError as e:
+                            st.error(f"语音文件处理失败：{str(e)}")
+                            self.audio_content = None
+                elif st.session_state.get('audio_voice').endswith('.txt'):
                     self.audio_content = read_file(st.session_state.get('audio_voice'))
+                else:
+                    self.audio_content = None
 
         audio_speed = st.session_state.get("audio_speed")
         if audio_speed == "normal":

@@ -1,9 +1,15 @@
 import subprocess
 import numpy as np
 from typing import List
-import sherpa_onnx
-
 from tools.utils import must_have_value
+
+# 条件导入sherpa_onnx
+try:
+    import sherpa_onnx
+    SHERPA_ONNX_AVAILABLE = True
+except ImportError:
+    SHERPA_ONNX_AVAILABLE = False
+    sherpa_onnx = None
 
 class SenseVoiceRecognitionResult:
     def __init__(self, text, begin_time, end_time):
@@ -18,6 +24,9 @@ class SenseVoiceRecognitionResult:
 class SenseVoiceRecognitionService:
     def __init__(self):
         super().__init__()
+        if not SHERPA_ONNX_AVAILABLE:
+            raise ImportError("sherpa-onnx依赖不可用，SenseVoice语音识别功能无法使用")
+        
         self.model_path = "sensevoice/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/model.onnx"
         must_have_value(self.model_path, "请设置 SenseVoice 模型路径")
         self.tokens_path = "sensevoice/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/tokens.txt"

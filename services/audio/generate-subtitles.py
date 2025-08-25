@@ -104,7 +104,15 @@ from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
-import sherpa_onnx
+
+# 条件导入sherpa_onnx
+try:
+    import sherpa_onnx
+    SHERPA_ONNX_AVAILABLE = True
+except ImportError:
+    SHERPA_ONNX_AVAILABLE = False
+    sherpa_onnx = None
+    print("警告：sherpa-onnx依赖不可用，语音识别功能将无法使用")
 
 
 def get_args():
