@@ -33,9 +33,54 @@ delete_first_visit_session_state("all_first_visit")
 
 common_ui()
 
-st.markdown(f"<h1 style='text-align: center; font-weight:bold; font-family:comic sans ms; padding-top: 0rem;'> \
-            {app_title}</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>基本配置信息</h2>", unsafe_allow_html=True)
+# 添加自定义CSS样式
+st.markdown("""
+<style>
+.main-title {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+.sub-title {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+.config-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.section-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    border-left: 4px solid #3498db;
+    padding-left: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# 主标题
+st.markdown(f'<div class="main-title">{app_title}</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">🎬 专业的短视频制作工具 - 让创作更简单</div>', unsafe_allow_html=True)
+
+# 添加分隔线
+st.divider()
+
+# 配置信息标题
+st.markdown('<div class="section-header">⚙️ 基本配置信息</div>', unsafe_allow_html=True)
 
 if 'ui_language' not in st.session_state:
     st.session_state['ui_language'] = 'zh-CN - 简体中文'
@@ -202,18 +247,32 @@ def set_llm_model_name(provider, key):
     save_config()
 
 
-# 设置language
-display_languages = []
-selected_index = 0
-for i, code in enumerate(languages.keys()):
-    display_languages.append(f"{code} - {languages[code]}")
-    if f"{code} - {languages[code]}" == st.session_state['ui_language']:
-        selected_index = i
-# print("selected_index:", selected_index)
-selected_language = st.selectbox(tr("Language"), options=display_languages,
-                                 index=selected_index, key='ui_language', on_change=set_ui_language)
-# 设置资源
-resource_container = st.container(border=True)
+# 语言设置区域
+st.markdown('<div class="section-header">🌐 界面语言设置</div>', unsafe_allow_html=True)
+with st.container():
+    display_languages = []
+    selected_index = 0
+    for i, code in enumerate(languages.keys()):
+        display_languages.append(f"{code} - {languages[code]}")
+        if f"{code} - {languages[code]}" == st.session_state['ui_language']:
+            selected_index = i
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        selected_language = st.selectbox(
+            tr("Language"), 
+            options=display_languages,
+            index=selected_index, 
+            key='ui_language', 
+            on_change=set_ui_language,
+            help="选择界面显示语言"
+        )
+
+st.divider()
+
+# 资源配置区域
+st.markdown('<div class="section-header">📁 素材资源配置</div>', unsafe_allow_html=True)
+resource_container = st.container()
 with resource_container:
     resource_providers = ['pexels', 'pixabay', 'stableDiffusion', 'comfyUI']
     selected_resource_provider = my_config['resource']['provider']
@@ -254,10 +313,13 @@ with resource_container:
             st.text_input(tr("Stable Diffusion API Server Address"), value=sd_api_address,
                           key='stableDiffusion_api_server_address', on_change=save_stable_diffusion_api_server_address)
 
-# 设置语音
-audio_container = st.container(border=True)
+st.divider()
+
+# 音频配置区域
+st.markdown('<div class="section-header">🎵 音频服务配置</div>', unsafe_allow_html=True)
+audio_container = st.container()
 with audio_container:
-    st.info(tr("Audio Provider Info"))
+    st.info("🔊 " + tr("Audio Provider Info"))
 
     # local TTS config
     local_tts_container = st.container(border=True)
@@ -435,9 +497,12 @@ with audio_container:
                               on_change=set_audio_app_key, key=audio_provider + "_app_key",
                               args=(audio_provider, audio_provider + '_app_key'))
 
-# 设置默认的LLM
-llm_container = st.container(border=True)
-with (llm_container):
+st.divider()
+
+# LLM配置区域
+st.markdown('<div class="section-header">🤖 大语言模型配置</div>', unsafe_allow_html=True)
+llm_container = st.container()
+with llm_container:
     llm_providers = ['OpenAI', 'Moonshot', 'Azure', 'Qianfan', 'Baichuan', 'Tongyi', 'DeepSeek', 'Ollama']
     saved_llm_provider = my_config['llm']['provider']
     saved_llm_provider_index = 0

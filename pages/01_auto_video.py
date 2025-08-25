@@ -98,9 +98,33 @@ def generate_video(video_generator):
         main_generate_ai_video(video_generator)
 
 
-st.markdown(f"<h1 style='text-align: center; font-weight:bold; font-family:comic sans ms; padding-top: 0rem;'> \
-            {app_title}</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>自动短视频生成器</h2>", unsafe_allow_html=True)
+# 添加自定义CSS样式
+st.markdown("""
+<style>
+.page-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+.page-subtitle {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #666;
+    margin-bottom: 2rem;
+    font-weight: 300;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# 页面标题
+st.markdown(f'<div class="page-title">{app_title}</div>', unsafe_allow_html=True)
+st.markdown('<div class="page-subtitle">🎬 AI智能短视频生成器 - 一键创作精彩内容</div>', unsafe_allow_html=True)
+st.divider()
 
 # LLM区域
 llm_container = st.container(border=True)
